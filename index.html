@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Fitness - Gym Management System</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- Google Fonts: Inter -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              orange: '#f97316', // Flame Orange
+              orangeHover: '#ea580c',
+              teal: '#0d9488',   // Dark Teal accent
+              dark: '#0f172a',   // Dark Slate background
+              card: '#1e293b',   // Dark Slate Card
+              muted: '#334155',  // Border/Muted dark
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom Scrollbar for dark theme */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #f97316;
+    }
+    .gradient-text {
+      background: linear-gradient(135deg, #f97316 0%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+  </style>
+</head>
+<body class="bg-brand-dark text-slate-100 font-sans min-h-screen flex flex-col justify-between selection:bg-brand-orange selection:text-white">
+
+  <!-- Toast Notification Box -->
+  <div id="toast" class="fixed top-5 right-5 z-50 transform transition-all duration-300 translate-x-full opacity-0 max-w-sm w-full bg-slate-800 text-white p-4 rounded-xl shadow-2xl border border-brand-orange flex items-center space-x-3 pointer-events-none">
+    <i id="toast-icon" class="fas fa-info-circle text-brand-orange text-xl"></i>
+    <div id="toast-message" class="text-sm font-medium"></div>
+  </div>
+
+  <!-- Header / Navigation Bar -->
+  <header class="bg-slate-900/90 border-b border-slate-800 sticky top-0 z-40 backdrop-blur-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Logo -->
+      <div class="flex items-center space-x-3 cursor-pointer" onclick="handleLogoClick()">
+        <div class="bg-gradient-to-tr from-brand-orange to-brand-teal p-2.5 rounded-xl shadow-lg shadow-brand-orange/20">
+          <i class="fas fa-dumbbell text-white text-xl"></i>
+        </div>
+        <div>
+          <span class="text-xl font-extrabold tracking-tight text-white">My <span class="text-brand-orange">Fitness</span></span>
+          <span class="block text-[10px] text-teal-400 font-semibold tracking-wider uppercase">Club & Fitness Center</span>
+        </div>
+      </div>
+
+      <!-- User Context / Navigation Controls -->
+      <div id="header-user-controls" class="flex items-center space-x-4">
+        <!-- Injected via JS -->
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Dynamic View Container -->
+  <main id="app-container" class="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6">
+    <!-- View content loaded dynamically -->
+  </main>
+
+  <!-- Footer -->
+  <footer class="bg-slate-950 border-t border-slate-800/80 py-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div>
+        <p>© 2026 <strong class="text-slate-400">My Fitness Management System</strong>. All rights reserved.</p>
+        <p class="text-[11px] text-slate-600 mt-1">Empowering health & performance worldwide.</p>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button onclick="toggleChatbot()" class="text-slate-400 hover:text-brand-orange transition-colors flex items-center gap-1.5">
+          <i class="fas fa-headset text-sm"></i> Help Assistant
+        </button>
+        <span class="text-slate-700">|</span>
+        <button onclick="showSqlModal()" class="text-slate-400 hover:text-brand-orange transition-colors flex items-center gap-1.5">
+          <i class="fas fa-database text-sm"></i> SQL Schema
+        </button>
+      </div>
+    </div>
+  </footer>
+
+  <!-- FLOATING CHATBOT WIDGET -->
+  <div id="chatbot-widget" class="fixed bottom-6 right-6 z-50">
+    <!-- Floating Trigger Button -->
+    <button id="chatbot-toggle-btn" onclick="toggleChatbot()" class="bg-gradient-to-r from-brand-orange to-amber-600 hover:from-brand-orangeHover hover:to-amber-700 text-white p-4 rounded-full shadow-2xl flex items-center justify-center transition-all duration-300 hover:scale-105 group relative">
+      <i id="chatbot-icon" class="fas fa-comments text-2xl"></i>
+      <span class="absolute -top-1 -right-1 bg-teal-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full border-2 border-slate-900">AI</span>
+      <!-- Tooltip -->
+      <span class="absolute right-16 bg-slate-800 text-xs text-slate-200 px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none shadow-md border border-slate-700">Need Help? Chat here!</span>
+    </button>
+
+    <!-- Chat Window Modal -->
+    <div id="chatbot-box" class="hidden absolute bottom-16 right-0 w-80 sm:w-96 h-[480px] bg-slate-900 border border-slate-700 rounded-2xl shadow-2xl flex flex-col overflow-hidden transition-all duration-300 transform scale-95">
+      <!-- Chat Header -->
+      <div class="bg-slate-800/90 border-b border-slate-700 p-3.5 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="relative">
+            <div class="w-9 h-9 rounded-full bg-gradient-to-tr from-brand-orange to-brand-teal flex items-center justify-center text-white font-bold">
+              <i class="fas fa-robot text-sm"></i>
+            </div>
+            <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-slate-900 rounded-full"></span>
+          </div>
+          <div>
+            <h4 class="text-sm font-bold text-white leading-tight">My Fitness Assistant</h4>
+            <p class="text-[11px] text-teal-400 font-medium">Online • Instant Answers</p>
+          </div>
+        </div>
+        <button onclick="toggleChatbot()" class="text-slate-400 hover:text-white p-1 transition-colors">
+          <i class="fas fa-times text-lg"></i>
+        </button>
+      </div>
+
+      <!-- Quick Action Suggestions -->
+      <div class="bg-slate-950/60 p-2 border-b border-slate-800 flex gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
+        <button onclick="sendQuickQuestion('Gym timings')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-slate-700 transition">⏰ Timings</button>
+        <button onclick="sendQuickQuestion('Membership plans')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-slate-700 transition">💳 Plans & Fees</button>
+        <button onclick="sendQuickQuestion('Login help')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-slate-700 transition">🔑 Login Demo</button>
+        <button onclick="sendQuickQuestion('Gym location')" class="bg-slate-800 hover:bg-slate-700 text-slate-300 px-2.5 py-1 rounded-full whitespace-nowrap border border-slate-700 transition">📍 Locations</button>
+      </div>
+
+      <!-- Messages Body -->
+      <div id="chatbot-messages" class="flex-grow p-4 space-y-3 overflow-y-auto text-xs bg-slate-900">
+        <!-- Initial Message -->
+        <div class="flex items-start space-x-2">
+          <div class="w-7 h-7 rounded-full bg-brand-orange flex-shrink-0 flex items-center justify-center text-white font-bold text-[10px]">MF</div>
+          <div class="bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none border border-slate-700 max-w-[80%] leading-relaxed">
+            👋 Hi! Welcome to <strong>My Fitness</strong>. How can I help you today? You can ask me about plans, branch timings, trainers, or login credentials!
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input Footer -->
+      <form id="chatbot-form" onsubmit="handleChatSubmit(event)" class="p-3 bg-slate-950 border-t border-slate-800 flex gap-2">
+        <input type="text" id="chatbot-input" placeholder="Type your message..." class="flex-grow bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-orange" autocomplete="off">
+        <button type="submit" class="bg-brand-orange hover:bg-brand-orangeHover text-white px-3.5 py-2 rounded-xl text-xs font-semibold transition flex items-center justify-center">
+          <i class="fas fa-paper-plane"></i>
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- SQL Schema Exporter Modal -->
+  <div id="sql-modal" class="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center hidden p-4">
+    <div class="bg-slate-900 border border-slate-700 rounded-2xl w-full max-w-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]">
+      <div class="p-4 bg-slate-800 border-b border-slate-700 flex justify-between items-center">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-database text-brand-orange"></i>
+          <h3 class="font-bold text-lg text-white">My Fitness Database SQL Schema</h3>
+        </div>
+        <button onclick="hideSqlModal()" class="text-slate-400 hover:text-white transition">
+          <i class="fas fa-times text-xl"></i>
+        </button>
+      </div>
+      <div class="p-4 flex-grow overflow-y-auto font-mono text-xs text-emerald-400 bg-slate-950 border-b border-slate-800">
+        <pre id="sql-content" class="whitespace-pre-wrap selection:bg-slate-700"></pre>
+      </div>
+      <div class="p-4 bg-slate-900 flex justify-end space-x-3">
+        <button onclick="copySqlSchema()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-4 py-2 rounded-lg font-medium border border-slate-700 transition">
+          <i class="fas fa-copy mr-1"></i> Copy to Clipboard
+        </button>
+        <button onclick="hideSqlModal()" class="bg-brand-orange hover:bg-brand-orangeHover text-white text-xs px-4 py-2 rounded-lg font-medium transition">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Logic JavaScript -->
+  <script>
+    // --- APP DATA SEED & LOCAL STORAGE INITIALIZATION ---
+    const DEFAULT_DATA = {
+      users: [
+        { id: 1, name: 'System Admin', email: 'admin@myfitness.com', username: 'admin', password: '123', role: 'admin', phone: '9876543210' },
+        { id: 2, name: 'Alex Johnson', email: 'alex@example.com', username: 'member1', password: '123', role: 'customer', phone: '9123456789', planId: 2, joinDate: '2026-01-15', status: 'Active', trainerId: 1, branch: 'Downtown Central' }
+      ],
+      plans: [
+        { id: 1, name: 'Basic Fitness', price: 29.99, duration: '1 Month', features: ['Standard Gym Access', 'Locker Room Access', '1 Free Consultation'] },
+        { id: 2, name: 'Pro Performance', price: 69.99, duration: '3 Months', features: ['All Gym Access', 'Sauna & Pool', '2 Personal Trainer Sessions', 'Group Classes'] },
+        { id: 3, name: 'Elite Unlimited', price: 199.99, duration: '12 Months', features: ['VIP 24/7 Access', 'Unlimited Personal Training', 'Nutrition Plan', 'Free Guest Pass'] }
+      ],
+      trainers: [
+        { id: 1, name: 'Marcus Vance', specialty: 'Bodybuilding & Strength', rating: 4.9, image: 'https://images.unsplash.com/photo-1567013127542-490d757e51fc?w=300&auto=format&fit=crop&q=80', experience: '8 Years' },
+        { id: 2, name: 'Elena Rostova', specialty: 'HIIT & Functional Fitness', rating: 4.8, image: 'https://images.unsplash.com/photo-1548690312-e3b507d8c110?w=300&auto=format&fit=crop&q=80', experience: '6 Years' },
+        { id: 3, name: 'David Kim', specialty: 'Cardio & Crossfit Training', rating: 4.9, image: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&auto=format&fit=crop&q=80', experience: '5 Years' }
+      ],
+      branches: [
+        { id: 1, name: 'My Fitness - Downtown Central', address: '102 Fitness Boulevard, Downtown', timing: '05:00 AM - 11:00 PM', phone: '+1 800 555 0199' },
+        { id: 2, name: 'My Fitness - Westside Hub', address: '450 Westside Drive, Suite 12', timing: '06:00 AM - 10:00 PM', phone: '+1 800 555 0244' },
+        { id: 3, name: 'My Fitness - Metro Heights', address: '88 Skyline Road, Metro Area', timing: '24/7 Open', phone: '+1 800 555 0311' }
+      ],
+      payments: [
+        { id: 101, memberId: 2, memberName: 'Alex Johnson', planName: 'Pro Performance', amount: 69.99, date: '2026-02-01', method: 'Credit Card', status: 'Completed' }
+      ],
+      schedules: [
+        { day: 'Monday', workout: 'Chest & Triceps', duration: '60 Mins', instructor: 'Marcus Vance' },
+        { day: 'Tuesday', workout: 'Back & Biceps', duration: '60 Mins', instructor: 'Elena Rostova' },
+        { day: 'Wednesday', workout: 'Legs & Core', duration: '75 Mins', instructor: 'David Kim' },
+        { day: 'Thursday', workout: 'HIIT & Active Recovery', duration: '45 Mins', instructor: 'Elena Rostova' },
+        { day: 'Friday', workout: 'Shoulders & Abs', duration: '60 Mins', instructor: 'Marcus Vance' },
+        { day: 'Saturday', workout: 'Full Body Circuit', duration: '90 Mins', instructor: 'David Kim' }
+      ]
+    };
+
+    function loadState() {
+      const stored = localStorage.getItem('MY_FITNESS_APP_DATA');
+      if (!stored) {
+        localStorage.setItem('MY_FITNESS_APP_DATA', JSON.stringify(DEFAULT_DATA));
+        return DEFAULT_DATA;
+      }
+      return JSON.parse(stored);
+    }
+
+    function saveState(data) {
+      localStorage.setItem('MY_FITNESS_APP_DATA', JSON.stringify(data));
+    }
+
+    let appData = loadState();
+    let currentUser = JSON.parse(localStorage.getItem('MY_FITNESS_CURRENT_USER') || 'null');
+
+    // --- TOAST NOTIFICATION SYSTEM ---
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      const msgEl = document.getElementById('toast-message');
+      const iconEl = document.getElementById('toast-icon');
+
+      msgEl.innerText = message;
+      if (type === 'success') {
+        iconEl.className = 'fas fa-check-circle text-emerald-400 text-xl';
+        toast.className = toast.className.replace(/border-\w+/, 'border-emerald-500');
+      } else if (type === 'error') {
+        iconEl.className = 'fas fa-exclamation-triangle text-rose-500 text-xl';
+        toast.className = toast.className.replace(/border-\w+/, 'border-rose-500');
+      } else {
+        iconEl.className = 'fas fa-info-circle text-brand-orange text-xl';
+        toast.className = toast.className.replace(/border-\w+/, 'border-brand-orange');
+      }
+
+      toast.classList.remove('translate-x-full', 'opacity-0');
+      setTimeout(() => {
+        toast.classList.add('translate-x-full', 'opacity-0');
+      }, 3500);
+    }
+
+    // --- RENDER ENGINE ---
+    function renderApp() {
+      const container = document.getElementById('app-container');
+      const userControls = document.getElementById('header-user-controls');
+
+      if (!currentUser) {
+        // Render Public / Auth Login & Register View
+        userControls.innerHTML = `
+          <button onclick="switchAuthTab('login')" class="text-sm font-medium text-slate-300 hover:text-white transition">Login</button>
+          <button onclick="switchAuthTab('register')" class="bg-brand-orange hover:bg-brand-orangeHover text-white text-xs font-semibold px-4 py-2 rounded-xl transition shadow-md shadow-brand-orange/20">Register Now</button>
+        `;
+        renderAuthPage();
+        return;
+      }
+
+      // Render Logged-in Navigation Controls
+      userControls.innerHTML = `
+        <div class="flex items-center space-x-3 bg-slate-800/80 px-3 py-1.5 rounded-xl border border-slate-700">
+          <div class="w-8 h-8 rounded-lg ${currentUser.role === 'admin' ? 'bg-amber-500' : 'bg-brand-teal'} flex items-center justify-center font-bold text-white text-xs">
+            ${currentUser.name.charAt(0).toUpperCase()}
+          </div>
+          <div class="text-left hidden sm:block">
+            <p class="text-xs font-bold text-white leading-none">${currentUser.name}</p>
+            <span class="text-[10px] text-slate-400 capitalize">${currentUser.role} Account</span>
+          </div>
+        </div>
+        <button onclick="handleLogout()" class="text-slate-400 hover:text-rose-400 p-2 rounded-lg transition" title="Logout">
+          <i class="fas fa-sign-out-alt text-lg"></i>
+        </button>
+      `;
+
+      if (currentUser.role === 'admin') {
+        renderAdminDashboard();
+      } else {
+        renderCustomerPortal();
+      }
+    }
+
+    // --- AUTHENTICATION MODULE ---
+    let authTab = 'login';
+    function switchAuthTab(tab) {
+      authTab = tab;
+      renderAuthPage();
+    }
+
+    function renderAuthPage() {
+      const container = document.getElementById('app-container');
+      container.innerHTML = `
+        <div class="max-w-md mx-auto my-8">
+          <div class="glass-panel p-8 rounded-3xl shadow-2xl relative overflow-hidden">
+            <!-- Decorative Accent Blur -->
+            <div class="absolute -top-12 -right-12 w-32 h-32 bg-brand-orange/20 rounded-full blur-2xl pointer-events-none"></div>
+            <div class="absolute -bottom-12 -left-12 w-32 h-32 bg-brand-teal/20 rounded-full blur-2xl pointer-events-none"></div>
+
+            <div class="text-center mb-8">
+              <h2 class="text-3xl font-extrabold text-white tracking-tight">Welcome to <span class="text-brand-orange">My Fitness</span></h2>
+              <p class="text-xs text-slate-400 mt-2">Manage your fitness journey & membership with ease.</p>
+            </div>
+
+            <!-- Tab Switcher -->
+            <div class="flex bg-slate-900/80 p-1 rounded-xl mb-6 border border-slate-800">
+              <button onclick="switchAuthTab('login')" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${authTab === 'login' ? 'bg-brand-orange text-white shadow-md' : 'text-slate-400 hover:text-white'}">
+                <i class="fas fa-lock mr-1.5"></i> Sign In
+              </button>
+              <button onclick="switchAuthTab('register')" class="flex-1 py-2 text-xs font-semibold rounded-lg transition-all ${authTab === 'register' ? 'bg-brand-orange text-white shadow-md' : 'text-slate-400 hover:text-white'}">
+                <i class="fas fa-user-plus mr-1.5"></i> Register
+              </button>
+            </div>
+
+            ${authTab === 'login' ? `
+              <!-- LOGIN FORM -->
+              <form onsubmit="handleLoginSubmit(event)" class="space-y-4">
+                <div>
+                  <label class="block text-xs font-medium text-slate-300 mb-1">Username or Email</label>
+                  <div class="relative">
+                    <i class="fas fa-user absolute left-3.5 top-3 text-slate-500 text-xs"></i>
+                    <input type="text" id="login-username" required placeholder="admin or member1" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-orange text-white text-xs rounded-xl pl-9 pr-3 py-2.5 outline-none transition">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-300 mb-1">Password</label>
+                  <div class="relative">
+                    <i class="fas fa-key absolute left-3.5 top-3 text-slate-500 text-xs"></i>
+                    <input type="password" id="login-password" required placeholder="123" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-orange text-white text-xs rounded-xl pl-9 pr-3 py-2.5 outline-none transition">
+                  </div>
+                </div>
+
+                <div class="bg-slate-900/60 p-3 rounded-xl border border-slate-800/80 text-[11px] text-slate-400 space-y-1">
+                  <p class="font-bold text-slate-300"><i class="fas fa-key text-brand-orange mr-1"></i> Demo Credentials:</p>
+                  <p>• Admin: <code class="text-amber-400">admin</code> / <code class="text-amber-400">123</code></p>
+                  <p>• Member: <code class="text-teal-400">member1</code> / <code class="text-teal-400">123</code></p>
+                </div>
+
+                <button type="submit" class="w-full bg-gradient-to-r from-brand-orange to-amber-600 hover:from-brand-orangeHover hover:to-amber-700 text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition duration-200 shadow-lg shadow-brand-orange/20">
+                  Sign In
+                </button>
+              </form>
+            ` : `
+              <!-- REGISTER FORM -->
+              <form onsubmit="handleRegisterSubmit(event)" class="space-y-3">
+                <div>
+                  <label class="block text-xs font-medium text-slate-300 mb-1">Full Name</label>
+                  <input type="text" id="reg-name" required placeholder="John Doe" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-orange text-white text-xs rounded-xl px-3 py-2 outline-none">
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-300 mb-1">Email Address</label>
+                  <input type="email" id="reg-email" required placeholder="john@example.com" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-orange text-white text-xs rounded-xl px-3 py-2 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                  <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Username</label>
+                    <input type="text" id="reg-username" required placeholder="john123" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-orange text-white text-xs rounded-xl px-3 py-2 outline-none">
+                  </div>
+                  <div>
+                    <label class="block text-xs font-medium text-slate-300 mb-1">Phone</label>
+                    <input type="text" id="reg-phone" placeholder="9876543210" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-orange text-white text-xs rounded-xl px-3 py-2 outline-none">
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-300 mb-1">Select Membership Plan</label>
+                  <select id="reg-plan" class="w-full bg-slate-900 border border-slate-700 text-white text-xs rounded-xl px-3 py-2 outline-none">
+                    ${appData.plans.map(p => `<option value="${p.id}">${p.name} ($${p.price})</option>`).join('')}
+                  </select>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-slate-300 mb-1">Password</label>
+                  <input type="password" id="reg-password" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 focus:border-brand-orange text-white text-xs rounded-xl px-3 py-2 outline-none">
+                </div>
+
+                <button type="submit" class="w-full bg-brand-orange hover:bg-brand-orangeHover text-white font-bold py-3 rounded-xl text-xs uppercase tracking-wider transition shadow-lg shadow-brand-orange/20 mt-2">
+                  Create Member Account
+                </button>
+              </form>
+            `}
+          </div>
+        </div>
+      `;
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      const uInput = document.getElementById('login-username').value.trim();
+      const pInput = document.getElementById('login-password').value.trim();
+
+      const foundUser = appData.users.find(u => (u.username === uInput || u.email === uInput) && u.password === pInput);
+
+      if (foundUser) {
+        currentUser = foundUser;
+        localStorage.setItem('MY_FITNESS_CURRENT_USER', JSON.stringify(currentUser));
+        showToast(`Welcome back, ${currentUser.name}!`, 'success');
+        renderApp();
+      } else {
+        showToast('Invalid username or password credentials.', 'error');
+      }
+    }
+
+    function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('reg-name').value.trim();
+      const email = document.getElementById('reg-email').value.trim();
+      const username = document.getElementById('reg-username').value.trim();
+      const phone = document.getElementById('reg-phone').value.trim();
+      const planId = parseInt(document.getElementById('reg-plan').value);
+      const password = document.getElementById('reg-password').value.trim();
+
+      if (appData.users.some(u => u.username === username || u.email === email)) {
+        showToast('Username or email is already registered!', 'error');
+        return;
+      }
+
+      const newUser = {
+        id: Date.now(),
+        name,
+        email,
+        username,
+        password,
+        role: 'customer',
+        phone,
+        planId,
+        joinDate: new Date().toISOString().split('T')[0],
+        status: 'Active',
+        trainerId: 1,
+        branch: 'Downtown Central'
+      };
+
+      appData.users.push(newUser);
+      
+      // Auto-add payment record
+      const selectedPlan = appData.plans.find(p => p.id === planId);
+      if (selectedPlan) {
+        appData.payments.push({
+          id: Date.now() + 1,
+          memberId: newUser.id,
+          memberName: newUser.name,
+          planName: selectedPlan.name,
+          amount: selectedPlan.price,
+          date: new Date().toISOString().split('T')[0],
+          method: 'Online Registration',
+          status: 'Completed'
+        });
+      }
+
+      saveState(appData);
+      currentUser = newUser;
+      localStorage.setItem('MY_FITNESS_CURRENT_USER', JSON.stringify(currentUser));
+      showToast('Account registered successfully!', 'success');
+      renderApp();
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      localStorage.removeItem('MY_FITNESS_CURRENT_USER');
+      showToast('Logged out successfully.');
+      renderApp();
+    }
+
+    function handleLogoClick() {
+      if (currentUser) {
+        renderApp();
+      } else {
+        switchAuthTab('login');
+      }
+    }
+
+    // --- CUSTOMER PORTAL ---
+    let activeCustomerTab = 'dashboard';
+    function setCustomerTab(tab) {
+      activeCustomerTab = tab;
+      renderCustomerPortal();
+    }
+
+    function renderCustomerPortal() {
+      const container = document.getElementById('app-container');
+      const userPlan = appData.plans.find(p => p.id === currentUser.planId) || appData.plans[0];
+      const assignedTrainer = appData.trainers.find(t => t.id === currentUser.trainerId) || appData.trainers[0];
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <!-- Customer Banner Header -->
+          <div class="bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl relative overflow-hidden">
+            <div class="space-y-2 text-center sm:text-left z-10">
+              <span class="px-3 py-1 bg-brand-orange/20 text-brand-orange border border-brand-orange/30 rounded-full text-xs font-semibold">
+                Member Dashboard
+              </span>
+              <h1 class="text-2xl sm:text-3xl font-extrabold text-white">Hello, <span class="text-brand-orange">${currentUser.name}</span>!</h1>
+              <p class="text-xs text-slate-400">Branch: <strong class="text-slate-200">${currentUser.branch || 'Downtown Central'}</strong> | Status: <span class="text-emerald-400 font-bold">Active Member</span></p>
+            </div>
+            <div class="flex items-center gap-3 z-10">
+              <div class="bg-slate-800 border border-slate-700 px-4 py-3 rounded-2xl text-center">
+                <p class="text-[10px] text-slate-400 uppercase font-semibold">Current Plan</p>
+                <p class="text-sm font-bold text-white">${userPlan.name}</p>
+              </div>
+              <button onclick="setCustomerTab('plans')" class="bg-brand-orange hover:bg-brand-orangeHover text-white px-4 py-3 rounded-2xl text-xs font-bold transition shadow-lg shadow-brand-orange/20">
+                Upgrade Plan
+              </button>
+            </div>
+          </div>
+
+          <!-- Member Tab Navigation Bar -->
+          <div class="flex border-b border-slate-800 overflow-x-auto space-x-2 text-xs font-semibold no-scrollbar">
+            <button onclick="setCustomerTab('dashboard')" class="px-4 py-3 border-b-2 transition whitespace-nowrap ${activeCustomerTab === 'dashboard' ? 'border-brand-orange text-brand-orange' : 'border-transparent text-slate-400 hover:text-white'}">
+              <i class="fas fa-home mr-1.5"></i> Overview
+            </button>
+            <button onclick="setCustomerTab('plans')" class="px-4 py-3 border-b-2 transition whitespace-nowrap ${activeCustomerTab === 'plans' ? 'border-brand-orange text-brand-orange' : 'border-transparent text-slate-400 hover:text-white'}">
+              <i class="fas fa-layer-group mr-1.5"></i> Packages & Plans
+            </button>
+            <button onclick="setCustomerTab('schedule')" class="px-4 py-3 border-b-2 transition whitespace-nowrap ${activeCustomerTab === 'schedule' ? 'border-brand-orange text-brand-orange' : 'border-transparent text-slate-400 hover:text-white'}">
+              <i class="fas fa-calendar-alt mr-1.5"></i> Workout Schedule
+            </button>
+            <button onclick="setCustomerTab('trainers')" class="px-4 py-3 border-b-2 transition whitespace-nowrap ${activeCustomerTab === 'trainers' ? 'border-brand-orange text-brand-orange' : 'border-transparent text-slate-400 hover:text-white'}">
+              <i class="fas fa-user-ninja mr-1.5"></i> Personal Trainers
+            </button>
+            <button onclick="setCustomerTab('gyms')" class="px-4 py-3 border-b-2 transition whitespace-nowrap ${activeCustomerTab === 'gyms' ? 'border-brand-orange text-brand-orange' : 'border-transparent text-slate-400 hover:text-white'}">
+              <i class="fas fa-map-marker-alt mr-1.5"></i> Find My Gym
+            </button>
+          </div>
+
+          <!-- Customer View Switcher -->
+          <div class="pt-2">
+            ${getCustomerTabContent()}
+          </div>
+        </div>
+      `;
+    }
+
+    function getCustomerTabContent() {
+      const userPlan = appData.plans.find(p => p.id === currentUser.planId) || appData.plans[0];
+      const assignedTrainer = appData.trainers.find(t => t.id === currentUser.trainerId) || appData.trainers[0];
+      const userPayments = appData.payments.filter(p => p.memberId === currentUser.id);
+
+      if (activeCustomerTab === 'dashboard') {
+        return `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Active Plan Summary Card -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+              <div class="flex justify-between items-start">
+                <h3 class="font-bold text-white text-base">Plan Details</h3>
+                <span class="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold px-2 py-0.5 rounded-full">ACTIVE</span>
+              </div>
+              <div>
+                <p class="text-xl font-extrabold text-brand-orange">${userPlan.name}</p>
+                <p class="text-xs text-slate-400 mt-0.5">$${userPlan.price} / ${userPlan.duration}</p>
+              </div>
+              <ul class="text-xs text-slate-300 space-y-2 border-t border-slate-800 pt-3">
+                ${userPlan.features.map(f => `<li class="flex items-center gap-2"><i class="fas fa-check text-brand-teal text-xs"></i> ${f}</li>`).join('')}
+              </ul>
+            </div>
+
+            <!-- Assigned Personal Trainer -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+              <h3 class="font-bold text-white text-base">Assigned Trainer</h3>
+              <div class="flex items-center space-x-3">
+                <img src="${assignedTrainer.image}" class="w-14 h-14 rounded-xl object-cover border border-slate-700">
+                <div>
+                  <h4 class="text-sm font-bold text-white">${assignedTrainer.name}</h4>
+                  <p class="text-xs text-brand-teal">${assignedTrainer.specialty}</p>
+                  <p class="text-[11px] text-amber-400 mt-1"><i class="fas fa-star mr-1"></i>${assignedTrainer.rating} Rating</p>
+                </div>
+              </div>
+              <button onclick="setCustomerTab('trainers')" class="w-full bg-slate-800 hover:bg-slate-700 text-xs text-slate-200 py-2 rounded-xl transition border border-slate-700">
+                View All Trainers
+              </button>
+            </div>
+
+            <!-- Member Quick Payments History -->
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+              <h3 class="font-bold text-white text-base">Payment History</h3>
+              <div class="space-y-2 max-h-44 overflow-y-auto pr-1">
+                ${userPayments.length === 0 ? `<p class="text-xs text-slate-500">No payment logs found.</p>` : 
+                  userPayments.map(p => `
+                    <div class="bg-slate-950/60 p-2.5 rounded-xl border border-slate-800 flex justify-between items-center text-xs">
+                      <div>
+                        <p class="font-semibold text-slate-200">${p.planName}</p>
+                        <p class="text-[10px] text-slate-500">${p.date} • ${p.method}</p>
+                      </div>
+                      <span class="font-bold text-emerald-400">$${p.amount}</span>
+                    </div>
+                  `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (activeCustomerTab === 'plans') {
+        return `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            ${appData.plans.map(p => `
+              <div class="bg-slate-900 border ${p.id === currentUser.planId ? 'border-brand-orange ring-1 ring-brand-orange' : 'border-slate-800'} rounded-3xl p-6 flex flex-col justify-between space-y-6">
+                <div>
+                  ${p.id === currentUser.planId ? `<span class="bg-brand-orange text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider mb-3 inline-block">Current Subscription</span>` : ''}
+                  <h3 class="text-xl font-extrabold text-white">${p.name}</h3>
+                  <div class="mt-2 mb-4">
+                    <span class="text-3xl font-extrabold text-white">$${p.price}</span>
+                    <span class="text-xs text-slate-400">/ ${p.duration}</span>
+                  </div>
+                  <ul class="space-y-2.5 text-xs text-slate-300">
+                    ${p.features.map(f => `<li class="flex items-center gap-2"><i class="fas fa-check text-brand-orange"></i> ${f}</li>`).join('')}
+                  </ul>
+                </div>
+                <button onclick="subscribePlan(${p.id})" class="w-full ${p.id === currentUser.planId ? 'bg-slate-800 text-slate-400 cursor-default' : 'bg-brand-orange hover:bg-brand-orangeHover text-white'} py-3 rounded-xl text-xs font-bold transition">
+                  ${p.id === currentUser.planId ? 'Active Plan' : 'Select Package'}
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      if (activeCustomerTab === 'schedule') {
+        return `
+          <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+            <div class="p-4 bg-slate-800/80 border-b border-slate-700 flex justify-between items-center">
+              <h3 class="font-bold text-white text-sm"><i class="fas fa-dumbbell text-brand-orange mr-2"></i> Weekly Class & Workout Schedule</h3>
+              <span class="text-xs text-slate-400">Updated for 2026</span>
+            </div>
+            <div class="divide-y divide-slate-800">
+              ${appData.schedules.map(s => `
+                <div class="p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-slate-800/40 transition">
+                  <div class="flex items-center space-x-4">
+                    <span class="w-24 text-xs font-bold text-brand-teal uppercase">${s.day}</span>
+                    <div>
+                      <p class="text-sm font-bold text-white">${s.workout}</p>
+                      <p class="text-xs text-slate-400"><i class="fas fa-user-circle mr-1"></i> Instructor: ${s.instructor}</p>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-3">
+                    <span class="bg-slate-800 border border-slate-700 text-slate-300 text-xs px-3 py-1 rounded-full"><i class="far fa-clock mr-1"></i> ${s.duration}</span>
+                    <button onclick="showToast('Class reminder set for ${s.day}!', 'success')" class="text-xs bg-slate-800 hover:bg-brand-orange hover:text-white text-slate-300 px-3 py-1 rounded-lg border border-slate-700 transition">Book Spot</button>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      if (activeCustomerTab === 'trainers') {
+        return `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            ${appData.trainers.map(t => `
+              <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg flex flex-col justify-between">
+                <div>
+                  <img src="${t.image}" class="w-full h-48 object-cover">
+                  <div class="p-5 space-y-2">
+                    <div class="flex justify-between items-center">
+                      <h4 class="text-base font-bold text-white">${t.name}</h4>
+                      <span class="text-xs text-amber-400 font-bold"><i class="fas fa-star mr-1"></i>${t.rating}</span>
+                    </div>
+                    <p class="text-xs text-brand-teal font-semibold">${t.specialty}</p>
+                    <p class="text-xs text-slate-400">Experience: ${t.experience}</p>
+                  </div>
+                </div>
+                <div class="p-5 pt-0">
+                  <button onclick="assignTrainer(${t.id})" class="w-full ${currentUser.trainerId === t.id ? 'bg-emerald-600 text-white' : 'bg-slate-800 hover:bg-slate-700 text-slate-200'} py-2.5 rounded-xl text-xs font-bold transition border border-slate-700">
+                    ${currentUser.trainerId === t.id ? '<i class="fas fa-check mr-1"></i> Your Trainer' : 'Select as Trainer'}
+                  </button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      if (activeCustomerTab === 'gyms') {
+        return `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            ${appData.branches.map(b => `
+              <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4 flex flex-col justify-between">
+                <div class="space-y-3">
+                  <div class="w-10 h-10 rounded-xl bg-brand-orange/20 border border-brand-orange/30 flex items-center justify-center text-brand-orange font-bold">
+                    <i class="fas fa-building"></i>
+                  </div>
+                  <h3 class="text-base font-bold text-white">${b.name}</h3>
+                  <p class="text-xs text-slate-400 leading-relaxed"><i class="fas fa-map-pin text-rose-400 mr-1.5"></i> ${b.address}</p>
+                  <p class="text-xs text-slate-300"><i class="far fa-clock text-teal-400 mr-1.5"></i> ${b.timing}</p>
+                  <p class="text-xs text-slate-300"><i class="fas fa-phone text-slate-400 mr-1.5"></i> ${b.phone}</p>
+                </div>
+                <button onclick="setHomeBranch('${b.name}')" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-2.5 rounded-xl text-xs font-bold transition border border-slate-700">
+                  ${currentUser.branch === b.name ? '<i class="fas fa-check-circle text-emerald-400 mr-1"></i> Selected Branch' : 'Set Primary Branch'}
+                </button>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+
+      return '';
+    }
+
+    function subscribePlan(planId) {
+      const plan = appData.plans.find(p => p.id === planId);
+      if (!plan) return;
+
+      currentUser.planId = planId;
+      // Update state user
+      const uIndex = appData.users.findIndex(u => u.id === currentUser.id);
+      if (uIndex !== -1) {
+        appData.users[uIndex] = currentUser;
+      }
+
+      // Record payment
+      appData.payments.push({
+        id: Date.now(),
+        memberId: currentUser.id,
+        memberName: currentUser.name,
+        planName: plan.name,
+        amount: plan.price,
+        date: new Date().toISOString().split('T')[0],
+        method: 'Credit Card',
+        status: 'Completed'
+      });
+
+      saveState(appData);
+      localStorage.setItem('MY_FITNESS_CURRENT_USER', JSON.stringify(currentUser));
+      showToast(`Successfully subscribed to ${plan.name}!`, 'success');
+      renderCustomerPortal();
+    }
+
+    function assignTrainer(trainerId) {
+      currentUser.trainerId = trainerId;
+      const uIndex = appData.users.findIndex(u => u.id === currentUser.id);
+      if (uIndex !== -1) {
+        appData.users[uIndex] = currentUser;
+      }
+      saveState(appData);
+      localStorage.setItem('MY_FITNESS_CURRENT_USER', JSON.stringify(currentUser));
+      showToast('Personal trainer updated!', 'success');
+      renderCustomerPortal();
+    }
+
+    function setHomeBranch(branchName) {
+      currentUser.branch = branchName;
+      const uIndex = appData.users.findIndex(u => u.id === currentUser.id);
+      if (uIndex !== -1) {
+        appData.users[uIndex] = currentUser;
+      }
+      saveState(appData);
+      localStorage.setItem('MY_FITNESS_CURRENT_USER', JSON.stringify(currentUser));
+      showToast(`Primary branch set to ${branchName}!`, 'success');
+      renderCustomerPortal();
+    }
+
+    // --- ADMIN PORTAL ---
+    let activeAdminTab = 'members';
+    function setAdminTab(tab) {
+      activeAdminTab = tab;
+      renderAdminDashboard();
+    }
+
+    function renderAdminDashboard() {
+      const container = document.getElementById('app-container');
+      const totalMembers = appData.users.filter(u => u.role === 'customer').length;
+      const totalRevenue = appData.payments.reduce((acc, curr) => acc + (curr.amount || 0), 0).toFixed(2);
+
+      container.innerHTML = `
+        <div class="space-y-6">
+          <!-- Admin Top Banner & Stats -->
+          <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-slate-900 border border-slate-800 p-6 rounded-3xl">
+            <div>
+              <span class="bg-amber-500/10 text-amber-400 border border-amber-500/30 text-[10px] font-bold px-3 py-1 rounded-full uppercase">Admin Control Panel</span>
+              <h1 class="text-2xl font-extrabold text-white mt-1">Management Portal</h1>
+            </div>
+            <div class="flex flex-wrap gap-4">
+              <div class="bg-slate-950 border border-slate-800 px-4 py-2.5 rounded-2xl">
+                <p class="text-[10px] text-slate-400 font-semibold uppercase">Total Members</p>
+                <p class="text-lg font-bold text-white">${totalMembers}</p>
+              </div>
+              <div class="bg-slate-950 border border-slate-800 px-4 py-2.5 rounded-2xl">
+                <p class="text-[10px] text-slate-400 font-semibold uppercase">Total Earnings</p>
+                <p class="text-lg font-bold text-emerald-400">$${totalRevenue}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin Navigation Tabs -->
+          <div class="flex border-b border-slate-800 overflow-x-auto space-x-2 text-xs font-semibold no-scrollbar">
+            <button onclick="setAdminTab('members')" class="px-4 py-3 border-b-2 transition whitespace-nowrap ${activeAdminTab === 'members' ? 'border-brand-orange text-brand-orange' : 'border-transparent text-slate-400 hover:text-white'}">
+              <i class="fas fa-users mr-1.5"></i> Members List
+            </button>
+            <button onclick="setAdminTab('reports')" class="px-4 py-3 border-b-2 transition whitespace-nowrap ${activeAdminTab === 'reports' ? 'border-brand-orange text-brand-orange' : 'border-transparent text-slate-400 hover:text-white'}">
+              <i class="fas fa-file-invoice-dollar mr-1.5"></i> Payment Reports
+            </button>
+            <button onclick="setAdminTab('trainers')" class="px-4 py-3 border-b-2 transition whitespace-nowrap ${activeAdminTab === 'trainers' ? 'border-brand-orange text-brand-orange' : 'border-transparent text-slate-400 hover:text-white'}">
+              <i class="fas fa-user-shield mr-1.5"></i> Manage Trainers
+            </button>
+          </div>
+
+          <!-- Admin View Switcher Content -->
+          <div class="pt-2">
+            ${getAdminTabContent()}
+          </div>
+        </div>
+      `;
+    }
+
+    function getAdminTabContent() {
+      if (activeAdminTab === 'members') {
+        const members = appData.users.filter(u => u.role === 'customer');
+        return `
+          <div class="space-y-4">
+            <div class="flex justify-between items-center">
+              <h3 class="font-bold text-white text-base">Gym Members (${members.length})</h3>
+              <button onclick="showAddMemberModal()" class="bg-brand-orange hover:bg-brand-orangeHover text-white px-3.5 py-2 rounded-xl text-xs font-bold transition">
+                <i class="fas fa-user-plus mr-1"></i> Add New Member
+              </button>
+            </div>
+
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                  <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                    <tr>
+                      <th class="p-3.5">Name</th>
+                      <th class="p-3.5">Email / Phone</th>
+                      <th class="p-3.5">Plan</th>
+                      <th class="p-3.5">Branch</th>
+                      <th class="p-3.5">Joined</th>
+                      <th class="p-3.5 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800">
+                    ${members.map(m => {
+                      const plan = appData.plans.find(p => p.id === m.planId);
+                      return `
+                        <tr class="hover:bg-slate-800/40 transition">
+                          <td class="p-3.5 font-bold text-white">${m.name}</td>
+                          <td class="p-3.5">${m.email}<br><span class="text-slate-500">${m.phone || 'N/A'}</span></td>
+                          <td class="p-3.5"><span class="bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-[11px]">${plan ? plan.name : 'Standard'}</span></td>
+                          <td class="p-3.5">${m.branch || 'Downtown'}</td>
+                          <td class="p-3.5 text-slate-400">${m.joinDate || '2026-01-01'}</td>
+                          <td class="p-3.5 text-right space-x-2">
+                            <button onclick="deleteMember(${m.id})" class="text-rose-400 hover:text-rose-300 p-1 transition" title="Delete Member">
+                              <i class="fas fa-trash"></i>
+                            </button>
+                          </td>
+                        </tr>
+                      `;
+                    }).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (activeAdminTab === 'reports') {
+        return `
+          <div class="space-y-4">
+            <h3 class="font-bold text-white text-base">Payment & Billing Log</h3>
+            <div class="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-xl">
+              <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs text-slate-300">
+                  <thead class="bg-slate-950 text-slate-400 uppercase text-[10px] tracking-wider border-b border-slate-800">
+                    <tr>
+                      <th class="p-3.5">Invoice #</th>
+                      <th class="p-3.5">Member</th>
+                      <th class="p-3.5">Package</th>
+                      <th class="p-3.5">Date</th>
+                      <th class="p-3.5">Method</th>
+                      <th class="p-3.5 text-right">Amount</th>
+                    </tr>
+                  </thead>
+                  <tbody class="divide-y divide-slate-800">
+                    ${appData.payments.map(p => `
+                      <tr class="hover:bg-slate-800/40 transition">
+                        <td class="p-3.5 font-mono text-slate-400">#INV-${p.id}</td>
+                        <td class="p-3.5 font-bold text-white">${p.memberName}</td>
+                        <td class="p-3.5">${p.planName}</td>
+                        <td class="p-3.5 text-slate-400">${p.date}</td>
+                        <td class="p-3.5">${p.method}</td>
+                        <td class="p-3.5 text-right font-bold text-emerald-400">$${p.amount}</td>
+                      </tr>
+                    `).join('')}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+
+      if (activeAdminTab === 'trainers') {
+        return `
+          <div class="space-y-4">
+            <h3 class="font-bold text-white text-base">Fitness Instructors & Trainers</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+              ${appData.trainers.map(t => `
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3 flex items-center space-x-4">
+                  <img src="${t.image}" class="w-16 h-16 rounded-xl object-cover">
+                  <div>
+                    <h4 class="font-bold text-white text-sm">${t.name}</h4>
+                    <p class="text-xs text-brand-teal">${t.specialty}</p>
+                    <p class="text-[11px] text-slate-400 mt-1">${t.experience} Experience</p>
+                  </div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }
+
+      return '';
+    }
+
+    function deleteMember(memberId) {
+      if (confirm('Are you sure you want to remove this member?')) {
+        appData.users = appData.users.filter(u => u.id !== memberId);
+        saveState(appData);
+        showToast('Member account deleted.');
+        renderAdminDashboard();
+      }
+    }
+
+    function showAddMemberModal() {
+      const name = prompt('Enter Member Name:');
+      if (!name) return;
+      const username = prompt('Enter Username:');
+      if (!username) return;
+
+      const newM = {
+        id: Date.now(),
+        name,
+        email: `${username}@gmail.com`,
+        username,
+        password: '123',
+        role: 'customer',
+        phone: '9998887770',
+        planId: 1,
+        joinDate: new Date().toISOString().split('T')[0],
+        status: 'Active',
+        trainerId: 1,
+        branch: 'Downtown Central'
+      };
+
+      appData.users.push(newM);
+      saveState(appData);
+      showToast('New member added successfully!', 'success');
+      renderAdminDashboard();
+    }
+
+    // --- AI / NORMAL CHATBOT LOGIC ---
+    let chatbotOpen = false;
+
+    function toggleChatbot() {
+      const chatBox = document.getElementById('chatbot-box');
+      chatbotOpen = !chatbotOpen;
+      if (chatbotOpen) {
+        chatBox.classList.remove('hidden');
+        setTimeout(() => chatBox.classList.remove('scale-95'), 10);
+      } else {
+        chatBox.classList.add('scale-95');
+        setTimeout(() => chatBox.classList.add('hidden'), 200);
+      }
+    }
+
+    function handleChatSubmit(e) {
+      e.preventDefault();
+      const input = document.getElementById('chatbot-input');
+      const text = input.value.trim();
+      if (!text) return;
+
+      appendChatMessage(text, 'user');
+      input.value = '';
+
+      // Generate response
+      setTimeout(() => {
+        const botReply = getChatbotResponse(text);
+        appendChatMessage(botReply, 'bot');
+      }, 400);
+    }
+
+    function sendQuickQuestion(question) {
+      appendChatMessage(question, 'user');
+      setTimeout(() => {
+        const botReply = getChatbotResponse(question);
+        appendChatMessage(botReply, 'bot');
+      }, 300);
+    }
+
+    function appendChatMessage(msg, sender) {
+      const msgBox = document.getElementById('chatbot-messages');
+      const div = document.createElement('div');
+
+      if (sender === 'user') {
+        div.className = 'flex items-start justify-end space-x-2';
+        div.innerHTML = `
+          <div class="bg-brand-orange text-white p-3 rounded-2xl rounded-tr-none max-w-[80%] leading-relaxed">
+            ${escapeHtml(msg)}
+          </div>
+        `;
+      } else {
+        div.className = 'flex items-start space-x-2';
+        div.innerHTML = `
+          <div class="w-7 h-7 rounded-full bg-brand-orange flex-shrink-0 flex items-center justify-center text-white font-bold text-[10px]">MF</div>
+          <div class="bg-slate-800 text-slate-200 p-3 rounded-2xl rounded-tl-none border border-slate-700 max-w-[80%] leading-relaxed">
+            ${msg}
+          </div>
+        `;
+      }
+
+      msgBox.appendChild(div);
+      msgBox.scrollTop = msgBox.scrollHeight;
+    }
+
+    function getChatbotResponse(input) {
+      const query = input.toLowerCase();
+
+      if (query.includes('timing') || query.includes('time') || query.includes('open') || query.includes('hour')) {
+        return '⏰ <strong>My Fitness Timings:</strong><br>• Downtown Central: 05:00 AM - 11:00 PM<br>• Westside Hub: 06:00 AM - 10:00 PM<br>• Metro Heights: 24/7 Open';
+      }
+
+      if (query.includes('plan') || query.includes('fee') || query.includes('cost') || query.includes('price') || query.includes('membership')) {
+        return '💳 <strong>My Fitness Plans:</strong><br>• Basic Fitness: $29.99/mo<br>• Pro Performance: $69.99/3 mos<br>• Elite Unlimited: $199.99/year<br><br>Register or Login to subscribe!';
+      }
+
+      if (query.includes('login') || query.includes('demo') || query.includes('password') || query.includes('admin')) {
+        return '🔑 <strong>Demo Login Access:</strong><br>• Admin: <code>admin</code> / <code>123</code><br>• Member: <code>member1</code> / <code>123</code>';
+      }
+
+      if (query.includes('location') || query.includes('branch') || query.includes('where')) {
+        return '📍 <strong>My Fitness Gym Locations:</strong><br>1. Downtown Central - 102 Fitness Blvd<br>2. Westside Hub - 450 Westside Drive<br>3. Metro Heights - 88 Skyline Road';
+      }
+
+      if (query.includes('trainer') || query.includes('coach')) {
+        return '🏋️ <strong>Top Personal Trainers:</strong><br>• Marcus Vance (Strength & Bodybuilding)<br>• Elena Rostova (HIIT & Fitness)<br>• David Kim (Crossfit & Cardio)';
+      }
+
+      return '🤖 I am your <strong>My Fitness Assistant</strong>. You can ask me about gym timings, membership fees, trainer info, locations, or demo login help!';
+    }
+
+    function escapeHtml(text) {
+      return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    }
+
+    // --- SQL EXPORTER MODAL ---
+    function showSqlModal() {
+      const sqlText = `
+-- =========================================================
+-- MY FITNESS GYM MANAGEMENT SYSTEM DATABASE SCHEMA
+-- =========================================================
+
+CREATE TABLE IF NOT EXISTS users (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) UNIQUE NOT NULL,
+    username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
+    role ENUM('admin', 'customer') DEFAULT 'customer',
+    phone VARCHAR(20),
+    branch VARCHAR(100) DEFAULT 'Downtown Central',
+    join_date DATE DEFAULT CURRENT_DATE
+);
+
+CREATE TABLE IF NOT EXISTS plans (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL,
+    price DECIMAL(10,2) NOT NULL,
+    duration VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS payments (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    member_id INT,
+    plan_name VARCHAR(50),
+    amount DECIMAL(10,2),
+    payment_date DATE DEFAULT CURRENT_DATE,
+    method VARCHAR(50),
+    FOREIGN KEY (member_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- SEED DATA
+INSERT INTO users (name, email, username, password, role) 
+VALUES ('System Admin', 'admin@myfitness.com', 'admin', '123', 'admin'),
+       ('Alex Johnson', 'alex@example.com', 'member1', '123', 'customer');
+
+INSERT INTO plans (name, price, duration) 
+VALUES ('Basic Fitness', 29.99, '1 Month'),
+       ('Pro Performance', 69.99, '3 Months'),
+       ('Elite Unlimited', 199.99, '12 Months');
+      `.trim();
+
+      document.getElementById('sql-content').innerText = sqlText;
+      document.getElementById('sql-modal').classList.remove('hidden');
+    }
+
+    function hideSqlModal() {
+      document.getElementById('sql-modal').classList.add('hidden');
+    }
+
+    function copySqlSchema() {
+      const text = document.getElementById('sql-content').innerText;
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      showToast('SQL Schema copied to clipboard!', 'success');
+    }
+
+    // Initialize App on DOM Load
+    window.onload = function() {
+      renderApp();
+    };
+  </script>
+</body>
+</html>
