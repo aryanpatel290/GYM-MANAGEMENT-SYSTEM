@@ -12,6 +12,6 @@ Open your browser and navigate to https://my-fitness.site.je
 Distributed under the MIT License. See LICENSE for more information.
 
 # ✉️ Contact
-<b>Developer:</b> Jaymeen Mistri
-<b>Email:</b> your.email@example.com
-<b>Project Link:</b> https://github.com/your-username/gym-management-system
+<b>Developer:</b> Jaymeen Mistri<br>
+<b>Email:</b> your.email@example.com<br>
+<b>Project Link:</b> https://github.com/aryanpatel290/GYM-MANAGEMENT-SYSTEM.git
