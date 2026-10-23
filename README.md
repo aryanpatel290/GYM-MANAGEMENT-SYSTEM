@@ -13,5 +13,5 @@ Distributed under the MIT License. See LICENSE for more information.
 
 # ✉️ Contact
 <b>Developer:</b> Jaymeen Mistri<br>
-<b>Email:</b> your.email@example.com<br>
+<b>Email:</b> aryany6032@gmail.com<br>
 <b>Project Link:</b> https://github.com/aryanpatel290/GYM-MANAGEMENT-SYSTEM.git
